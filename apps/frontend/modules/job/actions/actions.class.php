@@ -10,9 +10,7 @@
  */
 class jobActions extends sfActions {
 	public function executeIndex(sfWebRequest $request) {
-		$this->jobeet_jobs = Doctrine::getTable('JobeetJob')
-			->createQuery('a')
-			->execute();
+		$this->categories = Doctrine_Core::getTable('JobeetCategory')->getWithJobs();
 	}
 
 	public function executeShow(sfWebRequest $request) {
@@ -64,5 +62,13 @@ class jobActions extends sfActions {
 
 			$this->redirect('job/edit?id=' . $jobeet_job->getId());
 		}
+	}
+
+	public function getActiveJobs() {
+		$q = $this->createQuery('j')
+			->where('j.expires_at > ?', date('Y-m-d H:i:s', time()))
+			->orderBy('j.expires_at DESC');
+
+		return $q->execute();
 	}
 }
